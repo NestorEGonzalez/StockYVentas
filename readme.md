@@ -1,4 +1,4 @@
-![Build Status](https://github.com/NestorEGonzalez/stockyventas/actions/workflows/maven.yml/badge.svg)
+![Build Status](https://github.com/NestorEGonzalez/stockyventas/actions/workflows/maven.yml/badge.svg?branch=master)
 
 # 📦 Stock y Ventas
 
