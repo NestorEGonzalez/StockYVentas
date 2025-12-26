@@ -28,7 +28,7 @@ Sistema de gestión de **stock** y **registro de ventas de productos**, desarrol
 
 1. Clonar el repositorio:
    ```bash
-   git clone https://github.com/usuario/stockyventas.git
+   git clone https://github.com/NestorEGonzalez/stockyventas.git
 
 2. Compilar y ejecutar:
     ```bash
