@@ -20,6 +20,8 @@ public class Producto {
     private int stock;
     private BigDecimal precio;
     
+    public Producto(){};
+
     public Producto(String nombre, Integer stock, BigDecimal precio) {
         this.nombre = nombre;
         this.stock = stock;
