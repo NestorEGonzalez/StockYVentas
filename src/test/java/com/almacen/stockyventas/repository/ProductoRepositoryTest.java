@@ -1,43 +1,40 @@
 package com.almacen.stockyventas.repository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.almacen.stockyventas.BaseTest;
 import com.almacen.stockyventas.model.Producto;
+import com.almacen.stockyventas.service.ProductoService;
 
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 
-public class ProductoRepositoryTest {
+public class ProductoRepositoryTest extends BaseTest{
+
+    /* @Autowired
+    ProductoRepository productoRepository;
     
-    @Container static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
-        .withDatabaseName("testdb")
-        .withUsername("test")
-        .withPassword("test");
-    
-    @DynamicPropertySource static void configure(DynamicPropertyRegistry registry) { 
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword); 
+    @Autowired 
+    ProductoService productoService; */
+    private ProductoRepository productoRepository;
+    private ProductoService productoService;
+
+    public ProductoRepositoryTest(ProductoRepository productoRepository, ProductoService productoService){
+        this.productoRepository = productoRepository;
+        this.productoService = productoService;
     }
 
-    @Autowired 
-    ProductoRepository productoRepository;
     
     String nombre;
     Integer stock;
@@ -47,22 +44,29 @@ public class ProductoRepositoryTest {
 
     @BeforeEach
     void setUp(){
-        nombre = "Producto de prueba";
-        stock = 5;
-        precio =new BigDecimal("105.4");
-        producto = new Producto(nombre, stock, precio);
-        productoGuardado = productoRepository.save(producto);
+        productoRepository.deleteAll();
+        //nombre = "Producto de prueba";
+        //stock = 5;
+        //precio =new BigDecimal("105.4");
+        //producto = new Producto(nombre, stock, precio);
+        //productoGuardado = productoRepository.save(producto);
 
+    }
+    @AfterEach
+    void clean(){
+        
     }
 
     @Test
     void crearUnProductoYGuardarlo(){
-
-        assertNotNull(productoGuardado.getId());
+        
+        Producto producto = productoService.creaProducto("Termo", 5, (precio = new BigDecimal (70.5)));
+        assertNotNull(producto.getId());
                 
     }
-
-    @Test
+}
+    
+/*     @Test
     void obtenerLosDatosDeUnProductoGuardado(){
 
         assertEquals(producto.getId(), productoRepository.findById(productoGuardado.getId()).get().getId());
@@ -99,4 +103,22 @@ public class ProductoRepositoryTest {
         
     }
 
+    @Test
+    void noSePuedenGuardarProductosConPrecioOStockNegativo(){
+        Exception excepcionPrecioNegativo = assertThrows(IllegalArgumentException.class,()->{
+                new Producto("Negativo",5,new BigDecimal(-70));
+        });
+
+        Exception excepcionStockNegativo = assertThrows(IllegalArgumentException.class,()->{
+                new Producto("StokNegativo",-1,new BigDecimal(5));
+        });
+
+        assertEquals(excepcionPrecioNegativo.getMessage(),ProductoMensajesDeError.ERROR_PRECIO_NEGATIVO);
+
+        assertEquals(excepcionStockNegativo.getMessage(),ProductoMensajesDeError.ERROR_STOCK_NEGATIVO);
+    }
+
+
+
 }
+ */

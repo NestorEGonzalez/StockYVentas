@@ -6,5 +6,7 @@ import com.almacen.stockyventas.model.Producto;
 
 public interface ProductoRepository extends JpaRepository<Producto, Long>{
 
+    boolean findOneByNombre(String nombre);
+
     
 }
