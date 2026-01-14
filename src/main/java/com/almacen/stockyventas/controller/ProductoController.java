@@ -25,7 +25,7 @@ public class ProductoController {
     @Autowired
     ProductoService productoService;
 
-    @GetMapping("/productos")
+    /* @GetMapping("/productos")
     public ResponseEntity<List<Producto>> obtenerProductos(){
         return ResponseEntity.ok(productoService.obtenerProductos());
     }
@@ -43,5 +43,5 @@ public class ProductoController {
     @DeleteMapping("/producto/{id}")
     public ResponseEntity<HttpStatus> borrarProducto(@PathVariable long id){
         return new ResponseEntity<HttpStatus>(HttpStatus.ACCEPTED);
-    }
+    } */
 }

@@ -1,10 +1,15 @@
 package com.almacen.stockyventas.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +18,9 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.almacen.stockyventas.BaseTest;
+import com.almacen.stockyventas.exception.NombreYaExistenteExepcion;
 import com.almacen.stockyventas.model.Producto;
-import com.almacen.stockyventas.service.ProductoService;
+
 
 @DataJpaTest
 @Testcontainers
@@ -22,103 +28,140 @@ import com.almacen.stockyventas.service.ProductoService;
 
 public class ProductoRepositoryTest extends BaseTest{
 
-    /* @Autowired
+    @Autowired
     ProductoRepository productoRepository;
     
-    @Autowired 
-    ProductoService productoService; */
-    private ProductoRepository productoRepository;
-    private ProductoService productoService;
-
-    public ProductoRepositoryTest(ProductoRepository productoRepository, ProductoService productoService){
-        this.productoRepository = productoRepository;
-        this.productoService = productoService;
-    }
-
+    String termoString;
+    String mateString;
+    Integer termoStock;
+    Integer mateStock;
+    BigDecimal termoPrecio;
+    BigDecimal matePrecio;
+    Producto termo;
+    Producto mate;
     
-    String nombre;
-    Integer stock;
-    BigDecimal precio;
-    Producto producto;
-    Producto productoGuardado;
-
     @BeforeEach
     void setUp(){
         productoRepository.deleteAll();
-        //nombre = "Producto de prueba";
-        //stock = 5;
-        //precio =new BigDecimal("105.4");
-        //producto = new Producto(nombre, stock, precio);
-        //productoGuardado = productoRepository.save(producto);
+        termoString = "Termo";
+        mateString = "Mate";
+        termoStock = 5;
+        mateStock = 4;
+        termoPrecio = new BigDecimal("105.4");
+        matePrecio = new BigDecimal("70.5");
+        termo = new Producto(termoString, termoStock, termoPrecio);
+        mate = new Producto(mateString, mateStock, matePrecio);
 
     }
-    @AfterEach
-    void clean(){
+
+    @Test
+    void test01_SePuedeCrearYGuardarUnProducto(){
+        Producto termoGuardado = productoRepository.save(termo);
+        assertNotNull(termoGuardado);
+        assertEquals(termoGuardado.getNombre(), termo.getNombre());
+        assertEquals(termoGuardado.getPrecio(), termo.getPrecio());
+        assertEquals(termoGuardado.getStock(), termo.getStock());
+    }
+
+    @Test 
+    void test02_sePuedeObtenerLosDatosDeUnProductoGuardado(){
+        Producto termoGuardado = productoRepository.save(termo);
+        assertEquals(termo.getNombre(), productoRepository.findById(termoGuardado.getId()).get().getNombre());
+        assertEquals(termo.getStock(), productoRepository.findById(termoGuardado.getId()).get().getStock());
+        assertEquals(termo.getPrecio(), productoRepository.findById(termoGuardado.getId()).get().getPrecio());
+        assertEquals(1, productoRepository.count());
+
+    }
+
+    @Test
+    void test03_sePuedenGuardarMasDeUnProducto(){
+        Producto termoGuardado  = productoRepository.save(termo);
+        Producto mateGuardado   = productoRepository.save(mate);
+
+        assertEquals(2, productoRepository.count());
+        assertEquals(termo.getNombre(), productoRepository.findById(termoGuardado.getId()).get().getNombre());
+        assertEquals(termo.getStock(), productoRepository.findById(termoGuardado.getId()).get().getStock());
+        assertEquals(termo.getPrecio(), productoRepository.findById(termoGuardado.getId()).get().getPrecio());
+        assertEquals(mate.getNombre(), productoRepository.findById(mateGuardado.getId()).get().getNombre());
+        assertEquals(mate.getStock(), productoRepository.findById(mateGuardado.getId()).get().getStock());
+        assertEquals(mate.getPrecio(), productoRepository.findById(mateGuardado.getId()).get().getPrecio());
+
+    }
+
+    @Test
+    void test04_sePuedeObtenerUnProductoPorSuNombre(){
+        Producto termoGuardado  = productoRepository.save(termo);
+        Producto mateGuardado   = productoRepository.save(mate);
+
+        assertEquals(termoGuardado.getId(),productoRepository.findByNombre(termoString).get().getId());
+        assertEquals(termoGuardado.getNombre(),productoRepository.findByNombre(termoString).get().getNombre());
+        assertEquals(termoGuardado.getPrecio(), productoRepository.findByNombre(termoString).get().getPrecio());
+        assertEquals(termoGuardado.getStock(), productoRepository.findByNombre(termoString).get().getStock());
+        assertEquals(mateGuardado.getId(),productoRepository.findByNombre(mateString).get().getId());
+        assertEquals(mateGuardado.getNombre(),productoRepository.findByNombre(mateString).get().getNombre());
+        assertEquals(mateGuardado.getPrecio(), productoRepository.findByNombre(mateString).get().getPrecio());
+        assertEquals(mateGuardado.getStock(), productoRepository.findByNombre(mateString).get().getStock());
+
+    }
+
+    @Test
+    void test05_sePuedeModificarLosDatosDeUnProductoGuardado(){
+        productoRepository.save(termo);
+        productoRepository.save(mate);
+
+        Producto termoGuardado  = productoRepository.findByNombre(termoString).get();
+        Producto mateGuardado   = productoRepository.findByNombre(mateString).get();
+
+        termoGuardado.setStock(15);
+        mateGuardado.setPrecio(new BigDecimal("50"));
+
+        productoRepository.save(termoGuardado);
+        productoRepository.save(mateGuardado);
+
+        assertEquals(15,productoRepository.findByNombre(termoString).get().getStock());
+        assertEquals((new BigDecimal("50")), productoRepository.findByNombre(mateString).get().getPrecio());
+        
+
+    }
+
+    @Test
+    void test06_sePuedeEliminarUnProductoGuardado(){
+        productoRepository.save(mate);
+        productoRepository.save(termo);
+        assertEquals(2,productoRepository.count());
+        Long idABorrar = productoRepository.findByNombre(mateString).get().getId();
+        productoRepository.deleteById(idABorrar);
+        assertEquals(1,productoRepository.count());
+        assertNotNull(productoRepository.findByNombre(termoString).get());
+
+    }
+
+    @Test
+    void test07_noSePuedenGuardarDosProductosConElMismoNombre(){
+        Producto termoGuardado = productoRepository.save(termo);
+        mate.setNombre(termoString);
+        assertEquals(1, productoRepository.count());
+        assertEquals(termoGuardado.getId(),productoRepository.findById(termoGuardado.getId()).get().getId());
+        assertEquals(termoGuardado.getNombre(),termoString);
+        assertEquals(termoGuardado, termoGuardado);
         
     }
 
     @Test
-    void crearUnProductoYGuardarlo(){
-        
-        Producto producto = productoService.creaProducto("Termo", 5, (precio = new BigDecimal (70.5)));
-        assertNotNull(producto.getId());
-                
+    void test08_sePuedenObtenerTodosLosProductosGuardados(){
+        productoRepository.save(termo);
+        productoRepository.save(mate);
+
+        List<Producto> productosGuardados = productoRepository.findAll();
+        List <Producto> listaDeProductos = Arrays.asList(termo,mate);
+        assertEquals(productosGuardados.size(),2);
+        assertFalse(productosGuardados.isEmpty());
+        assertTrue(productosGuardados.containsAll(listaDeProductos));
     }
+
+
+
+    
+    
 }
     
-/*     @Test
-    void obtenerLosDatosDeUnProductoGuardado(){
-
-        assertEquals(producto.getId(), productoRepository.findById(productoGuardado.getId()).get().getId());
-        assertEquals(producto.getNombre(), productoRepository.findById(productoGuardado.getId()).get().getNombre());
-        assertEquals(producto.getStock(), productoRepository.findById(productoGuardado.getId()).get().getStock());
-        assertEquals(producto.getPrecio(), productoRepository.findById(productoGuardado.getId()).get().getPrecio());
-    }
-    
-    @Test
-    void eliminarUnProductoGuardado(){
-
-        productoRepository.delete(productoGuardado);
-
-        assertTrue(productoRepository.findById(productoGuardado.getId()).isEmpty());
-    }
-
-    @Test
-    void modificarUnProductoGuardado(){
-
-        assertEquals(producto.getId(), productoRepository.findById(productoGuardado.getId()).get().getId());
-        assertEquals(producto.getNombre(), productoRepository.findById(productoGuardado.getId()).get().getNombre());
-        assertEquals(producto.getStock(), productoRepository.findById(productoGuardado.getId()).get().getStock());
-        assertEquals(producto.getPrecio(), productoRepository.findById(productoGuardado.getId()).get().getPrecio());
-
-        Producto productoModificado = productoRepository.findById(producto.getId()).get();
-        BigDecimal precioNuevo = new BigDecimal(500.4);
-        productoModificado.updateStock(2);
-        productoModificado.updatePrecio(precioNuevo);
-        productoRepository.save(productoModificado);
-        assertEquals(producto.getId(), productoRepository.findById(productoGuardado.getId()).get().getId());
-        assertEquals(producto.getNombre(), productoRepository.findById(productoGuardado.getId()).get().getNombre());
-        assertEquals(3, productoRepository.findById(productoGuardado.getId()).get().getStock());
-        assertEquals(precioNuevo, productoRepository.findById(productoGuardado.getId()).get().getPrecio());
-        
-    }
-
-    @Test
-    void noSePuedenGuardarProductosConPrecioOStockNegativo(){
-        Exception excepcionPrecioNegativo = assertThrows(IllegalArgumentException.class,()->{
-                new Producto("Negativo",5,new BigDecimal(-70));
-        });
-
-        Exception excepcionStockNegativo = assertThrows(IllegalArgumentException.class,()->{
-                new Producto("StokNegativo",-1,new BigDecimal(5));
-        });
-
-        assertEquals(excepcionPrecioNegativo.getMessage(),ProductoMensajesDeError.ERROR_PRECIO_NEGATIVO);
-
-        assertEquals(excepcionStockNegativo.getMessage(),ProductoMensajesDeError.ERROR_STOCK_NEGATIVO);
-    }
-
-
-
-}
- */

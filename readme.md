@@ -4,10 +4,10 @@
 
 **En desarrollo**
 
-Sistema de gestión de **stock** y **registro de ventas de productos**, desarrollado con **Spring Boot** y **PostgreSQL**.
+Sistema de gestión de **stock** y **registro de ventas de productos**, desarrollado con **Spring Boot** y **PostgreSQL** mediante **TDD**.
 
 ## 🚀 Características actuales
-- Alta, baja, modificación y consulta de productos.
+- Alta, baja, modificación y consulta de productos en la base de datos.
 - Persistencia con **Spring Data JPA**.
 - Pruebas de repositorios con **JUnit 5** y **Testcontainers** (PostgreSQL real en contenedor Docker).
 
@@ -42,6 +42,7 @@ Actualmente el sistema gestiona productos y pruebas de repositorios con PostgreS
 Todavía falta implementar los **endpoints REST** para poder interactuar con el sistema vía web (por ejemplo, crear, listar, modificar y eliminar productos desde un cliente HTTP).
 
 ## 🚀 Próximos pasos
+- Implementación de la lógica de negocio mediante el Service.
 - Implementar endpoints REST con Spring MVC.
 - Exponer API para gestionar stock y ventas desde el navegador o aplicaciones externas.
 - Agregar seguridad: login con usuario y contraseña.

@@ -12,7 +12,7 @@ import com.almacen.stockyventas.repository.ProductoRepository;
 @Service
 public class ProductoService {
 
-    private final ProductoRepository productoRepository;
+    /* private final ProductoRepository productoRepository;
 
     public ProductoService(ProductoRepository productoRepository){
         this.productoRepository=productoRepository;
@@ -45,7 +45,7 @@ public class ProductoService {
         if (productoRepository.findOneByNombre(nombre)) {
             throw new NombreYaExistenteExepcion(NombreYaExistenteExepcion.ERROR_NOMBRE_EXISTENTE);
         }
-    }
+    } */
     
     
 }

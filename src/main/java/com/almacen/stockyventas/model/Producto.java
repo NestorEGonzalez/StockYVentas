@@ -2,11 +2,13 @@ package com.almacen.stockyventas.model;
 
 import java.math.BigDecimal;
 
+//import org.hibernate.validator.constraints.UniqueElements;
 import org.jspecify.annotations.Nullable;
 
 import com.almacen.stockyventas.exception.ProductoConNombreInvalidoError;
 import com.almacen.stockyventas.exception.ValorInvalidoError;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -15,10 +17,11 @@ import jakarta.persistence.Id;
 public class Producto {
     @Id
     @GeneratedValue
-    
     private Long id;
     
+    @Column(name="nombre", unique = true, nullable = false)
     private String nombre;
+    
     private Integer stock;
     private BigDecimal precio;
     
